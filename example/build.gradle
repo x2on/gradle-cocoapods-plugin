@@ -1,0 +1,18 @@
+// Example build file
+
+buildscript {
+	repositories {
+   	 mavenLocal()
+   	 mavenCentral()
+	}
+	dependencies {
+		classpath group: 'de.felixschulze.gradle', name: 'gradle-cocoapods-plugin', version: '0.1-SNAPSHOT'
+	}
+}
+
+apply plugin: 'cocoapods'
+
+cocoapods {
+    teamCityLog = true
+    ignorePackages = ["AFNetworking"]
+}
