@@ -34,7 +34,7 @@ import org.slf4j.LoggerFactory
 
 class CocoapodsRepoUpdateTask extends DefaultTask {
 
-    private static final Logger LOG = LoggerFactory.getLogger(CocoapodsCheckTask.class)
+    private static final Logger LOG = LoggerFactory.getLogger(CocoapodsRepoUpdateTask.class)
 
     @TaskAction
     def checkUpdates() throws IOException {
