@@ -59,7 +59,7 @@ class CocoapodsCheckTask extends DefaultTask {
                 if (ignorePackages.contains(packageName)) {
                     LOG.info("Package " + packageName + " ignored.")
                 } else {
-                    LOG.info("Update available for " + packageName + ".")
+                    LOG.warn("Update available for " + packageName + ".")
                     numberOfUpdates++
                 }
             }
