@@ -24,63 +24,40 @@
 
 package de.felixschulze.gradle
 
+import de.felixschulze.teamcity.TeamCityStatusMessageHelper
+import de.felixschulze.teamcity.TeamCityStatusType
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleScriptException
 import org.gradle.api.tasks.TaskAction
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import de.felixschulze.teamcity.TeamCityStatusMessageHelper
-import de.felixschulze.teamcity.TeamCityStatusType
 
-class CocoapodsCheckTask extends DefaultTask {
+class CocoapodsRepoUpdateTask extends DefaultTask {
 
     private static final Logger LOG = LoggerFactory.getLogger(CocoapodsCheckTask.class)
-
 
     @TaskAction
     def checkUpdates() throws IOException {
 
         def commands = [
                 "pod",
-                "outdated",
-                "--no-repo-update"
+                "repo",
+                "update"
         ]
 
         Process process = CommandLineRunner.createCommand(".", commands, null)
 
-        Boolean updateAvailable = false
-
-        int numberOfUpdates = 0
         process.inputStream.eachLine {
-            if (updateAvailable && it.startsWith("- ") && it.contains(" -> ")) {
-                //Cleanup package name ("- AFNetworking 1.3.2 -> 2.0.0" --> "AFNetworking")
-                String packageName = it.minus("- ").minus(~/ \d((\d*)\.?).*? -> .*/)
-                Collection<String> ignorePackages = project.cocoapods.ignorePackages
-                if (ignorePackages.contains(packageName)) {
-                    LOG.info("Package " + packageName + " ignored.")
-                } else {
-                    LOG.warn("Update available for " + packageName + ".")
-                    numberOfUpdates++
-                }
-            }
-            if (it.contains("The following updates are available:")) {
-                updateAvailable = true
-            }
-            LOG.debug(it)
+            LOG.info(it)
         }
 
         process.waitFor()
 
-        if (numberOfUpdates > 0) {
+        if (process.exitValue() > 0) {
             if (project.xcode.teamCityLog) {
-                println TeamCityStatusMessageHelper.buildStatusFailureString(TeamCityStatusType.FAILURE, "CocoaPods: ${numberOfUpdates} Updates available")
+                println TeamCityStatusMessageHelper.buildStatusFailureString(TeamCityStatusType.FAILURE, "CocoaPods: Update repo failed")
             }
-            throw new GradleScriptException("CocoaPods: ${numberOfUpdates} updates available", null)
-        } else {
-            if (project.xcode.teamCityLog) {
-                println TeamCityStatusMessageHelper.buildStatusFailureString(TeamCityStatusType.NORMAL, "CocoaPods: No updates available")
-            }
-
+            throw new GradleScriptException("CocoaPods: Update repo failed", null)
         }
     }
 }
