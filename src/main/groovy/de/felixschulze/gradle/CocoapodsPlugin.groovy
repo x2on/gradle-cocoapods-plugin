@@ -57,6 +57,8 @@ class CocoapodsPlugin implements Plugin<Project> {
         cocoapodsInstallTask.group = COCOA_PODS_GROUP_NAME
         cocoapodsInstallTask.description = "Install or update project dependencies"
         cocoapodsInstallTask.outputs.upToDateWhen { false }
+        cocoapodsInstallTask.dependsOn { cocoapodsRepoUpdateTask }
+
     }
 
     void configureDependencies(final Project project) {
