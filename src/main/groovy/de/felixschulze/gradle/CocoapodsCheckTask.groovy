@@ -56,7 +56,7 @@ class CocoapodsCheckTask extends DefaultTask {
                 //Cleanup package name ("- AFNetworking 1.3.2 -> 2.0.0" --> "AFNetworking")
                 String packageName = it.minus("- ").minus(~/ \d((\d*)\.?).*? -> .*/)
                 Collection<String> ignorePackages = project.cocoapods.ignorePackages
-                if (ignorePackages.contains(packageName)) {
+                if (ignorePackages!= null && !ignorePackages.isEmpty() && ignorePackages.contains(packageName)) {
                     LOG.info("Package " + packageName + " ignored.")
                 } else {
                     LOG.warn("Update available for " + packageName + ".")
