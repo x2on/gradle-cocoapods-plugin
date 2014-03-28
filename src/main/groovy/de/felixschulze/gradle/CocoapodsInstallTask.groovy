@@ -63,7 +63,7 @@ class CocoapodsInstallTask extends DefaultTask {
         process.waitFor()
 
         if (process.exitValue() > 0) {
-            if (project.xcode.teamCityLog) {
+            if (project.cocoapods.teamCityLog) {
                 println TeamCityStatusMessageHelper.buildStatusFailureString(TeamCityStatusType.FAILURE, "CocoaPods: Failed to install dependencies")
             }
             throw new GradleScriptException("CocoaPods: Failed to install dependencies", null)

@@ -72,12 +72,12 @@ class CocoapodsCheckTask extends DefaultTask {
         process.waitFor()
 
         if (numberOfUpdates > 0) {
-            if (project.xcode.teamCityLog) {
+            if (project.cocoapods.teamCityLog) {
                 println TeamCityStatusMessageHelper.buildStatusFailureString(TeamCityStatusType.FAILURE, "CocoaPods: ${numberOfUpdates} Updates available")
             }
             throw new GradleScriptException("CocoaPods: ${numberOfUpdates} updates available", null)
         } else {
-            if (project.xcode.teamCityLog) {
+            if (project.cocoapods.teamCityLog) {
                 println TeamCityStatusMessageHelper.buildStatusFailureString(TeamCityStatusType.NORMAL, "CocoaPods: No updates available")
             }
 
