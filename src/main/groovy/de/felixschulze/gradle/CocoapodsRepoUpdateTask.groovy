@@ -55,7 +55,7 @@ class CocoapodsRepoUpdateTask extends DefaultTask {
 
         if (process.exitValue() > 0) {
             if (project.cocoapods.teamCityLog) {
-                println TeamCityStatusMessageHelper.buildStatusFailureString(TeamCityStatusType.FAILURE, "CocoaPods: Update repo failed")
+                println TeamCityStatusMessageHelper.buildStatusString(TeamCityStatusType.FAILURE, "CocoaPods: Update repo failed")
             }
             throw new GradleScriptException("CocoaPods: Update repo failed", null)
         }
