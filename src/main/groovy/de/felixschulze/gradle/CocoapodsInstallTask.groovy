@@ -54,6 +54,10 @@ class CocoapodsInstallTask extends DefaultTask {
 
         commands.add("--no-repo-update")
 
+        if (LOG.isDebugEnabled()) {
+            commands.add("--verbose");
+        }
+
         Process process = CommandLineRunner.createCommand(".", commands, null)
 
         process.inputStream.eachLine {
@@ -64,9 +68,9 @@ class CocoapodsInstallTask extends DefaultTask {
 
         if (process.exitValue() > 0) {
             if (project.cocoapods.teamCityLog) {
-                println TeamCityStatusMessageHelper.buildStatusString(TeamCityStatusType.FAILURE, "CocoaPods: Failed to install dependencies")
+                println TeamCityStatusMessageHelper.buildStatusString(TeamCityStatusType.FAILURE, "CocoaPods: Failed to install dependencies (Exit code: " + process.exitValue() + ")")
             }
-            throw new GradleScriptException("CocoaPods: Failed to install dependencies", null)
+            throw new GradleScriptException("CocoaPods: Failed to install dependencies (Exit code: " + process.exitValue() + ")", null)
 
         }
     }
