@@ -23,7 +23,7 @@ repositories {
 }
 
 dependencies {
-    groovy localGroovy()
+    compile localGroovy()
     compile gradleApi()
     compile 'de.felixschulze.teamcity:teamcity-status-message-helper:1.0'
 }
@@ -66,7 +66,7 @@ install.repositories.mavenInstaller {
 uploadArchives {
     repositories.mavenDeployer {
         if (signing.signatory) {
-            beforeDeployment { signPom(it) }
+            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
         }
         name = 'mavenCentralReleaseDeployer'
         repository(url: 'https://oss.sonatype.org/service/local/staging/deploy/maven2/') {
