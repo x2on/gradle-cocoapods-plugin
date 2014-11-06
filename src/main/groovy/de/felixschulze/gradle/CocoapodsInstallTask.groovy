@@ -76,13 +76,15 @@ class CocoapodsInstallTask extends DefaultTask {
                 if (sslHandShakeProblemFound) {
                     println TeamCityStatusMessageHelper.buildStatusString(TeamCityStatusType.FAILURE, "CocoaPods: SSL handshake aborted")
                 }
-                println TeamCityStatusMessageHelper.buildStatusString(TeamCityStatusType.FAILURE, "CocoaPods: Failed to install dependencies (Exit code: " + process.exitValue() + ")")
+                else {
+                    println TeamCityStatusMessageHelper.buildStatusString(TeamCityStatusType.FAILURE, "CocoaPods: Failed to install dependencies (Exit code: " + process.exitValue() + ")")
+                }
             }
             if (sslHandShakeProblemFound) {
-                throw new GradleScriptException("CocoaPods: Failed to install dependencies (Exit code: " + process.exitValue() + ")", null)
+                throw new GradleScriptException("CocoaPods: SSL handshake aborted", null)
             }
             else {
-                throw new GradleScriptException("CocoaPods: SSL handshake aborted", null)
+                throw new GradleScriptException("CocoaPods: Failed to install dependencies (Exit code: " + process.exitValue() + ")", null)
             }
 
         }
