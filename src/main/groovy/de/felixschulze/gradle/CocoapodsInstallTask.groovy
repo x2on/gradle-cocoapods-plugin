@@ -54,7 +54,7 @@ class CocoapodsInstallTask extends DefaultTask {
 
         commands.add("--no-repo-update")
 
-        if (LOG.isDebugEnabled()) {
+        if (LOG.isDebugEnabled() || project.cocoapods.teamCityLog) {
             commands.add("--verbose");
         }
 
