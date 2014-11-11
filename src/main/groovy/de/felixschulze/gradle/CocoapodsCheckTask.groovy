@@ -24,6 +24,7 @@
 
 package de.felixschulze.gradle
 
+import org.apache.commons.lang.StringUtils
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleScriptException
 import org.gradle.api.tasks.TaskAction
@@ -50,7 +51,8 @@ class CocoapodsCheckTask extends DefaultTask {
 
         Boolean updateAvailable = false
 
-        int numberOfUpdates = 0
+        def ArrayList<String> packageNamesWithUpdates = new ArrayList<String>()
+
         process.inputStream.eachLine {
             if (updateAvailable && it.startsWith("- ") && it.contains(" -> ")) {
                 //Cleanup package name ("- AFNetworking 1.3.2 -> 2.0.0" --> "AFNetworking")
@@ -60,7 +62,7 @@ class CocoapodsCheckTask extends DefaultTask {
                     LOG.info("Package " + packageName + " ignored.")
                 } else {
                     LOG.warn("Update available for " + packageName + ".")
-                    numberOfUpdates++
+                    packageNamesWithUpdates.add(packageName)
                 }
             }
             if (it.contains("The following updates are available:")) {
@@ -71,11 +73,14 @@ class CocoapodsCheckTask extends DefaultTask {
 
         process.waitFor()
 
-        if (numberOfUpdates > 0) {
+        if (!packageNamesWithUpdates.empty) {
+
+            def String message = "CocoaPods: ${packageNamesWithUpdates.size()} ${packageNamesWithUpdates.size() > 1 ? "Updates" : "Update" } available (${StringUtils.join(packageNamesWithUpdates,", ")})"
+
             if (project.cocoapods.teamCityLog) {
-                println TeamCityStatusMessageHelper.buildStatusString(TeamCityStatusType.FAILURE, "CocoaPods: ${numberOfUpdates} Updates available")
+                println TeamCityStatusMessageHelper.buildStatusString(TeamCityStatusType.FAILURE, message)
             }
-            throw new GradleScriptException("CocoaPods: ${numberOfUpdates} updates available", null)
+            throw new GradleScriptException(message, null)
         } else {
             if (project.cocoapods.teamCityLog) {
                 println TeamCityStatusMessageHelper.buildStatusString(TeamCityStatusType.NORMAL, "CocoaPods: No updates available")
