@@ -60,33 +60,30 @@ class CocoapodsInstallTask extends DefaultTask {
 
         Process process = CommandLineRunner.createCommand(".", commands, null)
 
-        def sslHandShakeProblemFound = false
+        def String errorMessage = null
 
         process.inputStream.eachLine {
             LOG.info(it)
+            if (it.contains("fatal: The remote end hung up unexpectedly")) {
+                errorMessage = "Remote end hung up unexpectedly"
+            }
             if (it.contains("Server aborted the SSL handshake")) {
-                sslHandShakeProblemFound = true
+                errorMessage = "SSL handshake aborted"
             }
         }
 
         process.waitFor()
 
         if (process.exitValue() > 0) {
-            if (project.cocoapods.teamCityLog) {
-                if (sslHandShakeProblemFound) {
-                    println TeamCityStatusMessageHelper.buildStatusString(TeamCityStatusType.FAILURE, "CocoaPods: SSL handshake aborted")
-                }
-                else {
-                    println TeamCityStatusMessageHelper.buildStatusString(TeamCityStatusType.FAILURE, "CocoaPods: Failed to install dependencies (Exit code: " + process.exitValue() + ")")
-                }
-            }
-            if (sslHandShakeProblemFound) {
-                throw new GradleScriptException("CocoaPods: SSL handshake aborted", null)
-            }
-            else {
-                throw new GradleScriptException("CocoaPods: Failed to install dependencies (Exit code: " + process.exitValue() + ")", null)
+            if (errorMessage == null) {
+                errorMessage = "Failed to install dependencies (Exit code: " + process.exitValue() + ")"
             }
 
+            if (project.cocoapods.teamCityLog) {
+                println TeamCityStatusMessageHelper.buildStatusString(TeamCityStatusType.FAILURE, "CocoaPods: " + errorMessage)
+            }
+
+            throw new GradleScriptException("CocoaPods: " + errorMessage, null)
         }
     }
 }
