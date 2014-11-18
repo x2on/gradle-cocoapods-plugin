@@ -75,7 +75,7 @@ class CocoapodsCheckTask extends DefaultTask {
 
         if (!packageNamesWithUpdates.empty) {
 
-            def String message = "CocoaPods: ${packageNamesWithUpdates.size()} ${packageNamesWithUpdates.size() > 1 ? "Updates" : "Update" } available (${StringUtils.join(packageNamesWithUpdates,", ")})"
+            def String message = "${packageNamesWithUpdates.size()} ${packageNamesWithUpdates.size() > 1 ? "Updates" : "Update" } available (${StringUtils.join(packageNamesWithUpdates,", ")})"
 
             if (project.cocoapods.teamCityLog) {
                 println TeamCityStatusMessageHelper.buildStatusString(TeamCityStatusType.FAILURE, message)
@@ -83,7 +83,7 @@ class CocoapodsCheckTask extends DefaultTask {
             throw new GradleScriptException(message, null)
         } else {
             if (project.cocoapods.teamCityLog) {
-                println TeamCityStatusMessageHelper.buildStatusString(TeamCityStatusType.NORMAL, "CocoaPods: No updates available")
+                println TeamCityStatusMessageHelper.buildStatusString(TeamCityStatusType.NORMAL, "No updates available")
             }
 
         }
