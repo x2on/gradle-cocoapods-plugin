@@ -12,11 +12,11 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'de.felixschulze.gradle:gradle-cocoapods-plugin:0.3.3+'
+        classpath 'de.felixschulze.gradle:gradle-cocoapods-plugin:1.0'
     }
 }
 
-apply plugin: 'cocoapods'
+apply plugin: 'de.felixschulze.gradle.cocoapods'
 ```
 
 ## Advanced usage

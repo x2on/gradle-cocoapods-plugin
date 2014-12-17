@@ -25,7 +25,7 @@ repositories {
 dependencies {
     compile localGroovy()
     compile gradleApi()
-    compile 'de.felixschulze.teamcity:teamcity-status-message-helper:1.0'
+    compile 'de.felixschulze.teamcity:teamcity-status-message-helper:1.0.2'
 }
 
 task sourceJar(type: Jar) {
@@ -57,10 +57,10 @@ gradle.taskGraph.whenReady { taskGraph ->
 
 
 install.repositories.mavenInstaller {
-    pom.project(pomConfiguration)
     if (signing.signatory) {
-        beforeDeployment { signing.signPom(it) }
+        beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
     }
+    pom.project(pomConfiguration)
 }
 
 uploadArchives {
