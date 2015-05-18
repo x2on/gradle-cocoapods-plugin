@@ -67,7 +67,7 @@ class CocoapodsCheckTask extends DefaultTask {
                     packageNamesWithUpdates.add(packageName)
                 }
             }
-            if (it.contains("The following updates are available:")) {
+            if (it.contains("The following updates are available:") || it.contains("The following pod updates are available:")) {
                 updateAvailable = true
             }
             LOG.debug(it)
