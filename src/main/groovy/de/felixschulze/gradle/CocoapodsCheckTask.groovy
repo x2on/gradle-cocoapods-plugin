@@ -59,8 +59,22 @@ class CocoapodsCheckTask extends DefaultTask {
             if (updateAvailable && it.startsWith("- ") && it.contains(" -> ")) {
                 //Cleanup package name ("- AFNetworking 1.3.2 -> 1.3.2 (latest version 2.0.0)" --> "AFNetworking")
                 String packageName = it.minus("- ").minus(~/ \d((\d*)\.?).*? -> .*/)
+                Boolean isReleaseVersion = true
+                //Check if beta or rc version
+                def m = it =~ /- .*\(latest version (.*)\)/
+                if (m) {
+                    try {
+                        String version = m.group(1)
+                        if (version.contains("beta") || version.contains("rc")) {
+                            isReleaseVersion = false
+                        }
+                    }
+                    catch (Exception e) {
+                        LOG.warn("No version number found.")
+                    }
+                }
                 Collection<String> ignorePackages = cocoaPodsPluginExtension.ignorePackages
-                if (ignorePackages!= null && !ignorePackages.isEmpty() && ignorePackages.contains(packageName)) {
+                if ((ignorePackages!= null && !ignorePackages.isEmpty() && ignorePackages.contains(packageName)) || !isReleaseVersion) {
                     LOG.info("Package " + packageName + " ignored.")
                 } else {
                     LOG.warn("Update available for " + packageName + ".")
