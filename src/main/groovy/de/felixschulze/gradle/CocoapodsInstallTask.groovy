@@ -40,7 +40,7 @@ class CocoapodsInstallTask extends DefaultTask {
     def installPods() throws IOException {
 
         def commands = [
-                "pod"
+                "bundle exec pod"
         ]
 
         def lockFile = new File(project.projectDir, 'Podfile.lock')
