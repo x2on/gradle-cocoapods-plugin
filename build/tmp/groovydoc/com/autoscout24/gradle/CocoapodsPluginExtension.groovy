@@ -22,42 +22,18 @@
  * THE SOFTWARE.
  */
 
-package de.felixschulze.gradle
+package com.autoscout24.gradle
 
-import de.felixschulze.teamcity.TeamCityStatusMessageHelper
-import de.felixschulze.teamcity.TeamCityStatusType
-import org.gradle.api.DefaultTask
-import org.gradle.api.GradleScriptException
-import org.gradle.api.tasks.TaskAction
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
+import org.gradle.api.Project
 
-class CocoapodsRepoUpdateTask extends DefaultTask {
+class CocoapodsPluginExtension {
+    
+    def Boolean teamCityLog = false
+    Collection<String> ignorePackages
 
-    private static final Logger LOG = LoggerFactory.getLogger(CocoapodsRepoUpdateTask.class)
+    private final Project project
 
-    @TaskAction
-    def checkUpdates() throws IOException {
-
-        def commands = [
-                "pod",
-                "repo",
-                "update"
-        ]
-
-        Process process = CommandLineRunner.createCommand(".", commands, null)
-
-        process.inputStream.eachLine {
-            LOG.info(it)
-        }
-
-        process.waitFor()
-
-        if (process.exitValue() > 0) {
-            if (project.cocoapods.teamCityLog) {
-                println TeamCityStatusMessageHelper.buildStatusString(TeamCityStatusType.FAILURE, "CocoaPods: Update repo failed")
-            }
-            throw new GradleScriptException("CocoaPods: Update repo failed", null)
-        }
+    public CocoapodsPluginExtension(Project project) {
+        this.project = project
     }
 }

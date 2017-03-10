@@ -1,4 +1,4 @@
-# gradle-cocoapods-plugin [![Build Status](https://travis-ci.org/x2on/gradle-cocoapods-plugin.png)](https://travis-ci.org/x2on/gradle-cocoapods-plugin)
+# gradle-cocoapods-plugin
 
 A Gradle plugin for Cocoapods.
 
@@ -12,11 +12,11 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'de.felixschulze.gradle:gradle-cocoapods-plugin:1.1'
+        classpath 'com.autoscout24.gradle:gradle-cocoapods-plugin:1.3'
     }
 }
 
-apply plugin: 'de.felixschulze.gradle.cocoapods'
+apply plugin: 'com.autoscout24.gradle.cocoapods'
 ```
 
 ## Advanced usage

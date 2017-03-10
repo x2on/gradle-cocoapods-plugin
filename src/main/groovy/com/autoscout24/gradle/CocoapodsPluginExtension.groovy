@@ -22,34 +22,18 @@
  * THE SOFTWARE.
  */
 
-package de.felixschulze.gradle
+package com.autoscout24.gradle
 
-class CommandLineRunner {
+import org.gradle.api.Project
 
-    def static Process createCommand(String directory, List<String> commandList, Map<String, String> environment) {
+class CocoapodsPluginExtension {
+    
+    def Boolean teamCityLog = false
+    Collection<String> ignorePackages
 
-        println "Run command: " + commandListToString(commandList)
+    private final Project project
 
-        if (environment != null) {
-            println "with additional environment variables: " + environment
-        }
-        def processBuilder = new ProcessBuilder(commandList)
-        processBuilder.redirectErrorStream(true)
-        processBuilder.directory(new File(directory))
-        if (environment != null) {
-            Map<String, String> env = processBuilder.environment()
-            env.putAll(environment)
-        }
-        def process = processBuilder.start()
-        return process
-    }
-
-
-    private static def commandListToString(List<String> commandList) {
-        def result = ""
-        commandList.each {
-            item -> result += item + " "
-        }
-        return "'" + result.trim() + "'"
+    public CocoapodsPluginExtension(Project project) {
+        this.project = project
     }
 }
