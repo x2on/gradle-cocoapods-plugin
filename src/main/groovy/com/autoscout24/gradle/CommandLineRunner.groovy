@@ -22,7 +22,7 @@
  * THE SOFTWARE.
  */
 
-package de.felixschulze.gradle
+package com.autoscout24.gradle
 
 class CommandLineRunner {
 

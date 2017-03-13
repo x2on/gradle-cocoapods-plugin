@@ -22,7 +22,7 @@
  * THE SOFTWARE.
  */
 
-package de.felixschulze.gradle
+package com.autoscout24.gradle
 
 import de.felixschulze.teamcity.TeamCityStatusMessageHelper
 import de.felixschulze.teamcity.TeamCityStatusType
@@ -32,27 +32,18 @@ import org.gradle.api.tasks.TaskAction
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
-class CocoapodsInstallTask extends DefaultTask {
+class CocoapodsRepoUpdateTask extends DefaultTask {
 
-    private static final Logger LOG = LoggerFactory.getLogger(CocoapodsInstallTask.class)
+    private static final Logger LOG = LoggerFactory.getLogger(CocoapodsRepoUpdateTask.class)
 
     @TaskAction
-    def installPods() throws IOException {
+    def checkUpdates() throws IOException {
 
         def commands = [
-                "pod"
+                "pod",
+                "repo",
+                "update"
         ]
-
-        def lockFile = new File(project.projectDir, 'Podfile.lock')
-        if (lockFile.exists()) {
-            LOG.info("Update outdated dependencies")
-            commands.add("update")
-        } else {
-            LOG.info("Install dependencies")
-            commands.add("install")
-        }
-
-        commands.add("--no-repo-update")
 
         Process process = CommandLineRunner.createCommand(".", commands, null)
 
@@ -64,10 +55,9 @@ class CocoapodsInstallTask extends DefaultTask {
 
         if (process.exitValue() > 0) {
             if (project.cocoapods.teamCityLog) {
-                println TeamCityStatusMessageHelper.buildStatusFailureString(TeamCityStatusType.FAILURE, "CocoaPods: Failed to install dependencies")
+                println TeamCityStatusMessageHelper.buildStatusString(TeamCityStatusType.FAILURE, "CocoaPods: Update repo failed")
             }
-            throw new GradleScriptException("CocoaPods: Failed to install dependencies", null)
-
+            throw new GradleScriptException("CocoaPods: Update repo failed", null)
         }
     }
 }

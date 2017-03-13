@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2013 Felix Schulze
+ * Copyright (c) 2013-2014 Felix Schulze
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,8 +22,9 @@
  * THE SOFTWARE.
  */
 
-package de.felixschulze.gradle
+package com.autoscout24.gradle
 
+import org.apache.commons.lang3.StringUtils
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleScriptException
 import org.gradle.api.tasks.TaskAction
@@ -40,6 +41,8 @@ class CocoapodsCheckTask extends DefaultTask {
     @TaskAction
     def checkUpdates() throws IOException {
 
+        CocoapodsPluginExtension cocoaPodsPluginExtension = project.cocoapods
+
         def commands = [
                 "pod",
                 "outdated",
@@ -50,20 +53,35 @@ class CocoapodsCheckTask extends DefaultTask {
 
         Boolean updateAvailable = false
 
-        int numberOfUpdates = 0
+        def ArrayList<String> packageNamesWithUpdates = new ArrayList<String>()
+
         process.inputStream.eachLine {
             if (updateAvailable && it.startsWith("- ") && it.contains(" -> ")) {
-                //Cleanup package name ("- AFNetworking 1.3.2 -> 2.0.0" --> "AFNetworking")
+                //Cleanup package name ("- AFNetworking 1.3.2 -> 1.3.2 (latest version 2.0.0)" --> "AFNetworking")
                 String packageName = it.minus("- ").minus(~/ \d((\d*)\.?).*? -> .*/)
-                Collection<String> ignorePackages = project.cocoapods.ignorePackages
-                if (ignorePackages!= null && !ignorePackages.isEmpty() && ignorePackages.contains(packageName)) {
+                Boolean isReleaseVersion = true
+                //Check if beta or rc version
+                def m = it =~ /- .*\(latest version (.*)\)/
+                if (m) {
+                    try {
+                        String version = m.group(1)
+                        if (version.contains("beta") || version.contains("rc")) {
+                            isReleaseVersion = false
+                        }
+                    }
+                    catch (Exception e) {
+                        LOG.warn("No version number found.")
+                    }
+                }
+                Collection<String> ignorePackages = cocoaPodsPluginExtension.ignorePackages
+                if ((ignorePackages!= null && !ignorePackages.isEmpty() && ignorePackages.contains(packageName)) || !isReleaseVersion) {
                     LOG.info("Package " + packageName + " ignored.")
                 } else {
                     LOG.warn("Update available for " + packageName + ".")
-                    numberOfUpdates++
+                    packageNamesWithUpdates.add(packageName)
                 }
             }
-            if (it.contains("The following updates are available:")) {
+            if (it.contains("The following updates are available:") || it.contains("The following pod updates are available:")) {
                 updateAvailable = true
             }
             LOG.debug(it)
@@ -71,14 +89,17 @@ class CocoapodsCheckTask extends DefaultTask {
 
         process.waitFor()
 
-        if (numberOfUpdates > 0) {
-            if (project.cocoapods.teamCityLog) {
-                println TeamCityStatusMessageHelper.buildStatusFailureString(TeamCityStatusType.FAILURE, "CocoaPods: ${numberOfUpdates} Updates available")
+        if (!packageNamesWithUpdates.empty) {
+
+            def String message = "${packageNamesWithUpdates.size()} ${packageNamesWithUpdates.size() > 1 ? "Updates" : "Update" } available (${StringUtils.join(packageNamesWithUpdates,", ")})"
+
+            if (cocoaPodsPluginExtension.teamCityLog) {
+                println TeamCityStatusMessageHelper.buildStatusString(TeamCityStatusType.FAILURE, message)
             }
-            throw new GradleScriptException("CocoaPods: ${numberOfUpdates} updates available", null)
+            throw new GradleScriptException(message, null)
         } else {
-            if (project.cocoapods.teamCityLog) {
-                println TeamCityStatusMessageHelper.buildStatusFailureString(TeamCityStatusType.NORMAL, "CocoaPods: No updates available")
+            if (cocoaPodsPluginExtension.teamCityLog) {
+                println TeamCityStatusMessageHelper.buildStatusString(TeamCityStatusType.NORMAL, "No updates available")
             }
 
         }

@@ -22,7 +22,7 @@
  * THE SOFTWARE.
  */
 
-package de.felixschulze.gradle
+package com.autoscout24.gradle
 
 import de.felixschulze.teamcity.TeamCityStatusMessageHelper
 import de.felixschulze.teamcity.TeamCityStatusType
@@ -32,32 +32,53 @@ import org.gradle.api.tasks.TaskAction
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
-class CocoapodsRepoUpdateTask extends DefaultTask {
+class CocoapodsInstallTask extends DefaultTask {
 
-    private static final Logger LOG = LoggerFactory.getLogger(CocoapodsRepoUpdateTask.class)
+    private static final Logger LOG = LoggerFactory.getLogger(CocoapodsInstallTask.class)
 
     @TaskAction
-    def checkUpdates() throws IOException {
+    def installPods() throws IOException {
 
         def commands = [
-                "pod",
-                "repo",
-                "update"
+                "bundle",
+                 "exec",
+                 "pod"
         ]
+
+        LOG.info("Install dependencies")
+        commands.add("install")
+        commands.add("--no-repo-update")
+
+        if (LOG.isDebugEnabled() || project.cocoapods.teamCityLog) {
+            commands.add("--verbose");
+        }
 
         Process process = CommandLineRunner.createCommand(".", commands, null)
 
+        def String errorMessage = null
+
         process.inputStream.eachLine {
             LOG.info(it)
+            if (it.contains("fatal: The remote end hung up unexpectedly")) {
+                errorMessage = "Remote end hung up unexpectedly"
+            }
+            if (it.contains("Server aborted the SSL handshake")) {
+                errorMessage = "SSL handshake aborted"
+            }
         }
 
         process.waitFor()
 
         if (process.exitValue() > 0) {
-            if (project.cocoapods.teamCityLog) {
-                println TeamCityStatusMessageHelper.buildStatusFailureString(TeamCityStatusType.FAILURE, "CocoaPods: Update repo failed")
+            if (errorMessage == null) {
+                errorMessage = "Failed to install dependencies (Exit code: " + process.exitValue() + ")"
             }
-            throw new GradleScriptException("CocoaPods: Update repo failed", null)
+
+            if (project.cocoapods.teamCityLog) {
+                println TeamCityStatusMessageHelper.buildStatusString(TeamCityStatusType.FAILURE, "CocoaPods: " + errorMessage)
+            }
+
+            throw new GradleScriptException("CocoaPods: " + errorMessage, null)
         }
     }
 }
