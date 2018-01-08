@@ -3,7 +3,7 @@ buildscript {
       mavenCentral()
    }
    dependencies {
-    classpath 'com.github.townsfolk:gradle-release:1.2'
+      classpath 'com.github.townsfolk:gradle-release:1.2'
    }
 }
 
@@ -13,7 +13,7 @@ apply plugin: 'maven'
 apply plugin: 'signing'
 apply plugin: 'release'
 
-group = 'de.felixschulze.gradle'
+group = 'com.autoscout24.gradle'
 
 ext.archivesBaseName = 'gradle-cocoapods-plugin'
 ext.isSnapshot = version.endsWith("-SNAPSHOT")
@@ -26,6 +26,7 @@ dependencies {
     compile localGroovy()
     compile gradleApi()
     compile 'de.felixschulze.teamcity:teamcity-status-message-helper:1.0.2'
+    compile 'org.apache.commons:commons-lang3:3.5'
 }
 
 task sourceJar(type: Jar) {
@@ -107,9 +108,9 @@ def getPomConfiguration() {
             }
         }
         scm {
-            connection 'scm:https://x2on@github.com/x2on/gradle-cocoapods-plugin'
-            developerConnection 'scm:git@github.com:x2on/gradle-cocoapods-plugin.git'
-            url 'https://github.com/x2on/gradle-cocoapods-plugin'
+            connection 'scm:https://github.com/AutoScout24/gradle-cocoapods-plugin'
+            developerConnection 'scm:git@github.com:AutoScout24/gradle-cocoapods-plugin.git'
+            url 'https://github.com/AutoScout24/gradle-cocoapods-plugin'
         }
     }
 }

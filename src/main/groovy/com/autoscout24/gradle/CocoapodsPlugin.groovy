@@ -22,7 +22,7 @@
  * THE SOFTWARE.
  */
 
-package de.felixschulze.gradle
+package com.autoscout24.gradle
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -55,7 +55,7 @@ class CocoapodsPlugin implements Plugin<Project> {
 
         CocoapodsInstallTask cocoapodsInstallTask = project.tasks.create("installPods", CocoapodsInstallTask)
         cocoapodsInstallTask.group = COCOA_PODS_GROUP_NAME
-        cocoapodsInstallTask.description = "Install or update project dependencies."
+        cocoapodsInstallTask.description = "Install project dependencies."
         cocoapodsInstallTask.outputs.upToDateWhen { false }
         cocoapodsInstallTask.dependsOn { cocoapodsRepoUpdateTask }
 

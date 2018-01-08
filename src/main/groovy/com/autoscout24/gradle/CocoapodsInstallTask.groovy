@@ -22,7 +22,7 @@
  * THE SOFTWARE.
  */
 
-package de.felixschulze.gradle
+package com.autoscout24.gradle
 
 import de.felixschulze.teamcity.TeamCityStatusMessageHelper
 import de.felixschulze.teamcity.TeamCityStatusType
@@ -40,18 +40,13 @@ class CocoapodsInstallTask extends DefaultTask {
     def installPods() throws IOException {
 
         def commands = [
-                "pod"
+                "bundle",
+                 "exec",
+                 "pod"
         ]
 
-        def lockFile = new File(project.projectDir, 'Podfile.lock')
-        if (lockFile.exists()) {
-            LOG.info("Update outdated dependencies")
-            commands.add("update")
-        } else {
-            LOG.info("Install dependencies")
-            commands.add("install")
-        }
-
+        LOG.info("Install dependencies")
+        commands.add("install")
         commands.add("--no-repo-update")
 
         if (LOG.isDebugEnabled() || project.cocoapods.teamCityLog) {

@@ -22,9 +22,8 @@
  * THE SOFTWARE.
  */
 
-package de.felixschulze.gradle
+package com.autoscout24.gradle
 
-import org.apache.commons.lang.StringUtils
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleScriptException
 import org.gradle.api.tasks.TaskAction
@@ -91,7 +90,7 @@ class CocoapodsCheckTask extends DefaultTask {
 
         if (!packageNamesWithUpdates.empty) {
 
-            def String message = "${packageNamesWithUpdates.size()} ${packageNamesWithUpdates.size() > 1 ? "Updates" : "Update" } available (${StringUtils.join(packageNamesWithUpdates,", ")})"
+            def String message = "${packageNamesWithUpdates.size()} ${packageNamesWithUpdates.size() > 1 ? "Updates" : "Update" } available (${packageNamesWithUpdates.join(", ")})"
 
             if (cocoaPodsPluginExtension.teamCityLog) {
                 println TeamCityStatusMessageHelper.buildStatusString(TeamCityStatusType.FAILURE, message)
